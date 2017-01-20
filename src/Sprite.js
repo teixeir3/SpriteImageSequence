@@ -10,13 +10,15 @@ var bannerboy = bannerboy || {};
 
 // new_options optional options:
 // offset: pixel offset if needed. defaults to 0.
+// animation time: defaults to 24 frames / second depending on the frame #.
+// callback: set the callback to be run at the end of the sprite animation timeline.
 
 
 // Example usage:
 // var sprite_container = bannerboy.createElement({id: "sprite-container", top: 174, left: 0, centerX: true, parent: banner});
 	// var sprite = new Sprite({id: "sprite", total_frames: 30, backgroundSize: sprite_width + "px " + sprite_height + "px", width: sprite_frame_width, height: sprite_frame_height, left: 0, top: 0, backgroundImage: "bottle_spritesheet_half_res.png", retina: true, parent: sprite_container});
-function Sprite(new_options, startFrame) {
-	this.options = bannerboy.combineObjects({id: "sprite", left: 0, top: 0, overflow: "hidden", frame: 1, centerX: true, offset: 0, transformOrigin: "center bottom"}, new_options);
+var Sprite = bannerboy.Sprite = function(_options) {
+	this.options = bannerboy.combineObjects({id: "sprite", left: 0, top: 0, overflow: "hidden", frame: 1, centerX: true, offset: 0, transformOrigin: "center bottom"}, _options);
 	this.body = bannerboy.createElement(this.options);
 	this.body.set({css: {backgroundPosition: this.options.offset + "px 0"}});
 	this.total_frames = this.options.total_frames;
@@ -30,9 +32,13 @@ Sprite.prototype.roundedFrame  = function() {
 };
 
 // Build your timelines here.
-Sprite.prototype.createTimeline = function() {
-	return new BBTimeline({onComplete: this.stopCounter.bind(this)})
+Sprite.prototype.createTimeline = function(_time, _callback) {
+	var time = _time || (1 / 24) * this.options.total_frames;
+	var callback = _callback || this.stopCounter.bind(this);
+	return new BBTimeline({onComplete: callback})
+	.to(this.current_frame, time, {frame: this.options.total_frames - 1, ease: Power2.easeInOut})
 
+	// Example:
 	// .to(bottle_first_frame, 0.3, {opacity: 0, ease: Power1.easeInOut})
 	// .to(this.current_frame, 1, {frame: 29, ease: Power2.easeInOut})
 	// .chain()
@@ -61,7 +67,7 @@ Sprite.prototype.nextFrame = function() {
 Sprite.prototype.startCounter = function(new_time) {
 	var time = new_time || 4;
 
-	this.counter_tl = this.createTimeline(this.options.animation_time).play();
+	this.counter_tl = this.createTimeline(this.options.animationTime, this.options.callback).play();
 	TweenMax.ticker.addEventListener("tick", this.counterUpdate, this);
 }
 
