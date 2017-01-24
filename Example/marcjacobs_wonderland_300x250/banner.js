@@ -15,8 +15,8 @@ bannerboy.main = function() {
 
 	var images = [
 
-	"intro_spritesheet.jpg", 
-	"title_spritesheet.png", 
+		"intro_spritesheet.jpg", 
+		"title_spritesheet.png", 
 
 	];
 
@@ -32,7 +32,7 @@ bannerboy.main = function() {
 
 	 	var sprite_container_2 = bannerboy.createElement({id: "sprite-container", top: 0, left: 0, centerX: true, parent: banner});
 	 		var sprite_2 = new Sprite({animationTime: 0.5, id: "sprite", total_frames: 13, backgroundSize: sprite_width + "px " + sprite_height + "px", width: sprite_frame_width, height: sprite_frame_height, left: 0, top: 0, backgroundImage: "title_spritesheet.png", retina: true, parent: sprite_container_2});
-
+console.log("wtf");
 		/* Initiate
 		================================================= */
 		animations();
@@ -53,15 +53,14 @@ bannerboy.main = function() {
 
 
 			sprite_1.tl_in = new BBTimeline()
-		        .call(function() {
-		            sprite_1.startCounter();
-	       		 })
+	        .call(function() {
+	            sprite_1.startCounter();
+       		 })
 
-		    
 		   	sprite_2.tl_in = new BBTimeline()
-		           .call(function() {
-		 	          sprite_2.startCounter();
-		        })
+	           .call(function() {
+	 	          sprite_2.startCounter();
+	        })
 		}
 
 		/* Interactions

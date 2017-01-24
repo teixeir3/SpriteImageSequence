@@ -31,14 +31,7 @@ Sprite.prototype.roundedFrame  = function() {
 	return Math.round(this.current_frame.frame);
 };
 
-// Build your timelines here.
-Sprite.prototype.createTimeline = function(_time, _callback) {
-	var time = _time || (1 / 24) * this.options.total_frames;
-	var callback = _callback || this.stopCounter.bind(this);
-	return new BBTimeline({onComplete: callback})
-	.to(this.current_frame, time, {frame: this.options.total_frames - 1, ease: Power2.easeInOut})
-
-	// Example:
+// Example timeline:
 	// .to(bottle_first_frame, 0.3, {opacity: 0, ease: Power1.easeInOut})
 	// .to(this.current_frame, 1, {frame: 29, ease: Power2.easeInOut})
 	// .chain()
@@ -46,13 +39,20 @@ Sprite.prototype.createTimeline = function(_time, _callback) {
 	// .chain(-0.03)
 	// .to(sprite.body, .1, {opacity: 0})
 	// .timeScale(time_scale);
+// Override this method to build a custom timeline. animating this.current_frame.frame is what changes the frames.
+Sprite.prototype.createTimeline = function(_time, _callback) {
+	var time = _time || (1 / 24) * this.options.total_frames;
+	var callback = _callback || this.stopCounter.bind(this);
+
+	return new BBTimeline({onComplete: callback})
+	.to(this.current_frame, time, {frame: this.options.total_frames - 1, ease: Power2.easeInOut})
 };
 
 Sprite.prototype.prevFrame = function() {
 	if (this.roundedFrame() <= 1) {
 		this.body.set({frame: this.total_frames});
 	} else {
-		this.body.set({frame: parseInt(this.body.get("frame")) - 1});
+		this.body.set({frame: this.roundedFrame() - 1});
 	}
 }
 
@@ -60,8 +60,12 @@ Sprite.prototype.nextFrame = function() {
 	if (this.roundedFrame() >= this.total_frames) {
 		this.body.set({frame: 1});
 	} else {
-		this.body.set({frame: parseInt(this.body.get("frame")) + 1});
+		this.body.set({frame: this.roundedFrame() + 1});
 	}
+}
+
+Sprite.prototype.getFramePosition = function() {
+	return (this.roundedFrame()) * -(parseInt(this.body.get("width"))) + this.options.offset 
 }
 
 Sprite.prototype.startCounter = function(new_time) {
@@ -80,5 +84,5 @@ Sprite.prototype.resetCounter = function() {
 }
 
 Sprite.prototype.counterUpdate = function() {
-	this.body.set({css: {backgroundPosition: (this.roundedFrame()) * -(parseInt(this.body.get("width"))) + this.options.offset + "px 0"}}); 
+	this.body.set({css: {backgroundPosition: this.getFramePosition() + "px 0"}}); 
 }	
